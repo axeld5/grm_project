@@ -15,7 +15,7 @@ def folder_to_csv(folder_path):
         for file in os.listdir(path):
             if file.endswith('.txt'):
                 file_path = os.path.join(path, file)
-                pd_for_csv = pd_for_csv.append({'filename': open(file_path, 'r').read(), 'label': dico[i]}, ignore_index=True)
+                pd_for_csv = pd_for_csv.append({'review': open(file_path, 'r').read(), 'label': dico[i]}, ignore_index=True)
     
     pd_for_csv.to_csv(f'{folder_path}.csv', index=False)
     
