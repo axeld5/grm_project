@@ -2,6 +2,7 @@ import torch
 from torch_geometric.data import DataLoader
 from sklearn.model_selection import train_test_split
 import pandas as pd 
+import spacy
 
 from preprocessing_files.preprocess_review import preprocess_review
 from preprocessing_files.utils import get_num_pos_neg
@@ -17,13 +18,16 @@ if __name__ == "__main__":
     df = pd.read_csv('preprocessing_files/data/train.csv')
     df = df.sample(frac=1, random_state = 42).reset_index(drop=True)
     df.head()
+    nlp = spacy.load('en_core_web_md')
 
     list_of_reviews = [] 
 
-    for i in range(200):
-        data = preprocess_review(df['review'][i], df['label'][i])
+    amount_taken = 200 #must be inferior to 2500
+    frac_taken = amount_taken//10
+    for i in range(amount_taken):
+        data = preprocess_review(df['review'][i], df['label'][i], nlp)
         list_of_reviews.append(data)
-        if i%20 == 0:
+        if i%frac_taken == 0:
             print(i)
     print(list_of_reviews[0])
 

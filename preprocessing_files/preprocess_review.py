@@ -6,10 +6,10 @@ import torch
 from torch_geometric.data import Data
 
 
-def preprocess_review(review, label, graph_visu=False):
+def preprocess_review(review, label, nlp, graph_visu=False):
 
     ## preprocess of sentences to have a graph that "sees" sentences     
-    nlp = spacy.load('en_core_web_md')
+    
     sentences = create_sentence_list(review, nlp)
     dico_words = tokenize_words(sentences)
     G = create_graph(sentences, dico_words)
