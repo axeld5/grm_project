@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from torch_geometric.nn import SAGEConv
+from torch_geometric.nn import SAGEConv, global_add_pool
 
 '''
 Graph SAGE: SAmpling and aggreGatE, 
@@ -17,6 +17,7 @@ class GraphSAGE(torch.nn.Module):
     self.optimizer = torch.optim.Adam(self.parameters(),
                                       lr=0.01,
                                       weight_decay=5e-4)
+    self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
   def forward(self, x, edge_index):
     h = self.sage1(x, edge_index)
@@ -26,4 +27,5 @@ class GraphSAGE(torch.nn.Module):
     h = torch.relu(h)
     h = F.dropout(h, p=0.2, training=self.training)
     h = self.sage3(h, edge_index)
+    h = global_add_pool(h, torch.zeros(h.size(0), dtype=torch.long).to(self.device))
     return h, F.log_softmax(h, dim=1)

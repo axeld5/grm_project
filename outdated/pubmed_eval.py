@@ -10,7 +10,7 @@ from torch_geometric.utils import to_networkx
 from models.gat import GAT 
 from models.gcn import GCN 
 from models.graphsage import GraphSAGE
-from train_test_models import train, test
+from outdated.train_test_models import train, test
 
 
 if __name__ == "__main__":    

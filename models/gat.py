@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from torch_geometric.nn import GATConv
+from torch_geometric.nn import GATConv, global_add_pool
 
 
 '''
@@ -19,6 +19,7 @@ class GAT(torch.nn.Module):
         self.conv2 = GATConv(self.hid*self.in_head, num_classes, concat=False,
                              heads=self.out_head, dropout=0.6)
         self.optimizer = torch.optim.Adam(self.parameters(), lr=0.005, weight_decay=5e-4)
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     def forward(self,x, edge_index):
         
@@ -28,4 +29,5 @@ class GAT(torch.nn.Module):
         x = F.elu(x)
         x = F.dropout(x, p=0.6, training=self.training)
         x = self.conv2(x, edge_index)
+        x = global_add_pool(x, torch.zeros(x.size(0), dtype=torch.long).to(self.device))
         return x,F.log_softmax(x, dim=1)
