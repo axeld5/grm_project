@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     list_of_reviews = [] 
 
-    amount_taken = 200 #must be inferior to 2500
+    amount_taken = 200 #must be inferior to 25000
     frac_taken = amount_taken//10
     for i in range(amount_taken):
         data = preprocess_review(df['review'][i], df['label'][i], nlp)
