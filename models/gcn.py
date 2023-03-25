@@ -26,12 +26,12 @@ class GCN(torch.nn.Module):
         x = F.relu(x)
         x = F.dropout(x, p=self.dropout, training=self.training)
 
-        x = self.conv2(x, edge_index)
-        x = F.relu(x)
+        h = self.conv2(x, edge_index)
+        x = F.relu(x+h)
         x = F.dropout(x, p=self.dropout, training=self.training)
 
-        x = self.conv3(x, edge_index)
-        x = F.relu(x)
+        h = self.conv3(x, edge_index)
+        x = F.relu(x+h)
         x = F.dropout(x, p=self.dropout, training=self.training)
 
         x = self.conv4(x, edge_index)

@@ -2,7 +2,7 @@ import torch
 import pandas as pd 
 import spacy
 
-from torch_geometric.data import DataLoader
+from torch_geometric.loader import DataLoader
 from sklearn.model_selection import train_test_split
 
 from preprocessing_files.greedy_tokenize import preprocess_review
@@ -32,7 +32,7 @@ if __name__ == "__main__":
             print(i)
     print(list_of_reviews[0])
 
-    train_data, test_data = train_test_split(list_of_reviews, test_size=0.2, random_state=42)
+    train_data, test_data = train_test_split(list_of_reviews, test_size=0.1)
 
     pos,neg = get_num_pos_neg(train_data)
 
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     num_classes = 2
     epochs = 10
 
-    model = GCN(num_node_features, 300, num_classes, dropout=0.2).to(device)
+    model = GCN(num_node_features, 64, num_classes, dropout=0.2).to(device)
     for epoch in range(epochs):
         loss = train(model, train_loader, device)
         train_acc = test(model, train_loader, device)
