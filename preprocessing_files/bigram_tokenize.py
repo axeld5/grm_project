@@ -23,7 +23,7 @@ def biagram_preprocessing(review, label, nlp):
     list_of_words = [word for sent in sentences for word in sent]
     list_of_words = list(set(list_of_words))
     ## create graph 
-    G = biagrams_to_nx_graph(list_of_words, dico_biagrams, nlp)
+    G = biagrams_to_nx_graph(list_of_words, dico_biagrams)
     node_features, edges, edges_attr = get_graph_features(G, nlp)  
     # Get the label
     label_value = int(label)
@@ -56,7 +56,7 @@ def get_weighted_biagram_appearance(biagrams, sent, weights_each_type):
             dico_biagrams[(biagram[1], biagram[0])] += weights_each_type[sent[biagram[0]][0]] + weights_each_type[sent[biagram[1]][0]]
     return dico_biagrams
 
-def biagrams_to_nx_graph(list_of_words, dico_biagrams, nlp):
+def biagrams_to_nx_graph(list_of_words, dico_biagrams):
     G = nx.Graph()
     ## nodes as words 
     G.add_nodes_from(list_of_words)

@@ -1,8 +1,9 @@
 import torch
-from torch_geometric.data import DataLoader
-from sklearn.model_selection import train_test_split
 import pandas as pd 
 import spacy
+
+from torch_geometric.data import DataLoader
+from sklearn.model_selection import train_test_split
 
 from preprocessing_files.greedy_tokenize import preprocess_review
 from preprocessing_files.bigram_tokenize import biagram_preprocessing
@@ -22,7 +23,7 @@ if __name__ == "__main__":
 
     list_of_reviews = [] 
 
-    amount_taken = 5000 #must be inferior to 25000
+    amount_taken = 1000 #must be inferior to 25000
     frac_taken = amount_taken//10
     for i in range(amount_taken):
         data = biagram_preprocessing(df['review'][i], df['label'][i], nlp)
@@ -44,15 +45,15 @@ if __name__ == "__main__":
     num_classes = 2
     epochs = 10
 
-    """model = GCN(num_node_features, num_classes).to(device)
+    model = GCN(num_node_features, 300, num_classes, dropout=0.2).to(device)
     for epoch in range(epochs):
         loss = train(model, train_loader, device)
         train_acc = test(model, train_loader, device)
         test_acc = test(model, test_loader, device)
         print(f"Epoch: {epoch:03d}, Loss: {loss:.4f}, Train Acc: {train_acc:.4f}", f"Test Acc: {test_acc:.4f}")
-    print(f'\nGCN test accuracy: {test(model, test_loader, device)*100:.2f}%\n')"""
+    print(f'\nGCN test accuracy: {test(model, test_loader, device)*100:.2f}%\n')
 
-    model = GAT(num_node_features, 300, num_classes, dropout=0.2).to(device)
+    model = GAT(num_node_features, 64, num_classes, dropout=0.2).to(device)
     for epoch in range(epochs):
         loss = train(model, train_loader, device)
         train_acc = test(model, train_loader, device)
@@ -60,7 +61,7 @@ if __name__ == "__main__":
         print(f"Epoch: {epoch:03d}, Loss: {loss:.4f}, Train Acc: {train_acc:.4f}", f"Test Acc: {test_acc:.4f}")
     print(f'\nGAT test accuracy: {test(model, test_loader, device)*100:.2f}%\n')
 
-    model = GraphSAGE(num_node_features, 300, num_classes).to(device)
+    model = GraphSAGE(num_node_features, 64, num_classes).to(device)
     for epoch in range(epochs):
         loss = train(model, train_loader, device)
         train_acc = test(model, train_loader, device)
