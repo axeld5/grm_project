@@ -9,7 +9,7 @@ from preprocessing_files.greedy_tokenize import preprocess_review
 from preprocessing_files.bigram_tokenize import biagram_preprocessing
 from preprocessing_files.utils import get_num_pos_neg
 from models.simple_graphnet import Classifier
-from models.gat import GAT 
+from models.gat import GAT
 from models.gcn import GCN 
 from models.graphsage import GraphSAGE
 from train_test_text_models import train, test
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     num_classes = 2
     epochs = 10
 
-    model = GCN(num_node_features, 64, num_classes, dropout=0.2).to(device)
+    model = GCN(num_node_features, 256, num_classes, dropout=0.2).to(device)
     for epoch in range(epochs):
         loss = train(model, train_loader, device)
         train_acc = test(model, train_loader, device)
@@ -53,15 +53,15 @@ if __name__ == "__main__":
         print(f"Epoch: {epoch:03d}, Loss: {loss:.4f}, Train Acc: {train_acc:.4f}", f"Test Acc: {test_acc:.4f}")
     print(f'\nGCN test accuracy: {test(model, test_loader, device)*100:.2f}%\n')
 
-    model = GAT(num_node_features, 64, num_classes, dropout=0.2).to(device)
-    for epoch in range(epochs):
+    model = GAT(num_node_features, 128, num_classes, dropout=0.2).to(device)
+    for epoch in range(20):
         loss = train(model, train_loader, device)
         train_acc = test(model, train_loader, device)
         test_acc = test(model, test_loader, device)
         print(f"Epoch: {epoch:03d}, Loss: {loss:.4f}, Train Acc: {train_acc:.4f}", f"Test Acc: {test_acc:.4f}")
     print(f'\nGAT test accuracy: {test(model, test_loader, device)*100:.2f}%\n')
 
-    model = GraphSAGE(num_node_features, 64, num_classes).to(device)
+    model = GraphSAGE(num_node_features, 300, num_classes).to(device)
     for epoch in range(epochs):
         loss = train(model, train_loader, device)
         train_acc = test(model, train_loader, device)

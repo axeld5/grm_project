@@ -14,7 +14,8 @@ class GraphSAGE(torch.nn.Module):
     self.sage1 = SAGEConv(num_node_features, hidden_dim*2)
     self.sage2 = SAGEConv(hidden_dim*2, hidden_dim)
     self.sage3 = SAGEConv(hidden_dim, hidden_dim)
-    self.sage4 = SAGEConv(hidden_dim, num_classes)
+    self.sage4 = SAGEConv(hidden_dim, hidden_dim)
+    self.classifier = torch.nn.Linear(hidden_dim, num_classes)
     self.optimizer = torch.optim.Adam(self.parameters(),
                                       lr=0.0001)
                                         # weight_decay=5e-4)
@@ -34,21 +35,15 @@ class GraphSAGE(torch.nn.Module):
     h = F.dropout(h, p=0.2, training=self.training)
 
     # layer 3 
-    h = self.sage3(h, edge_index)
-    h = torch.relu(h)
+    x = self.sage3(h, edge_index)
+    h = torch.relu(h+x)
     h = F.dropout(h, p=0.5, training=self.training)
 
-     # layer 4
-    h = self.sage3(h, edge_index)
-    h = torch.relu(h)
-    h = F.dropout(h, p=0.5, training=self.training)
-
-     # layer 5
-    h = self.sage3(h, edge_index)
-    h = torch.relu(h)
-    h = F.dropout(h, p=0.2, training=self.training)
-
-    ## layer 6
+    ## layer 4
     h = self.sage4(h, edge_index)
     h = global_mean_pool(h, torch.zeros(h.size(0), dtype=torch.long).to(self.device))
+
+    ## classification layer 
+    h = self.classifier(h)
+    
     return h, F.log_softmax(h, dim=1)

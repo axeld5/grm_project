@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from torch_geometric.nn import GCNConv, global_add_pool
+from torch_geometric.nn import GCNConv, global_add_pool, global_mean_pool
 
 '''
 Graph Convolutional Network
@@ -12,7 +12,7 @@ class GCN(torch.nn.Module):
         self.conv1 = GCNConv(num_node_features, hidden_dim)
         self.conv2 = GCNConv(hidden_dim, hidden_dim)
         self.conv3 = GCNConv(hidden_dim, hidden_dim)
-        self.conv4 = GCNConv(hidden_dim, num_classes)
+        self.classifier = torch.nn.Linear(hidden_dim, num_classes)
         self.optimizer = torch.optim.Adam(self.parameters(), lr=0.0001, weight_decay=5e-4)
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.dropout = dropout
@@ -30,10 +30,7 @@ class GCN(torch.nn.Module):
         x = F.relu(x+h)
         x = F.dropout(x, p=self.dropout, training=self.training)
 
-        h = self.conv3(x, edge_index)
-        x = F.relu(x+h)
-        x = F.dropout(x, p=self.dropout, training=self.training)
-
-        x = self.conv4(x, edge_index)
-        x = global_add_pool(x, torch.zeros(x.size(0), dtype=torch.long).to(self.device))
+        x = self.conv3(x, edge_index)
+        x = global_mean_pool(x, torch.zeros(x.size(0), dtype=torch.long).to(self.device))
+        x = self.classifier(x)
         return x, F.log_softmax(x, dim=1)
