@@ -45,7 +45,7 @@ def get_biagrams(sentences):
             biagrams.append((list(sent.keys())[i], list(sent.keys())[i+1]))
     return biagrams
 
-def get_weighted_biagram_appearance(biagrams, sent, weights_each_type):
+def old_get_weighted_biagram_appearance(biagrams, sent, weights_each_type):
     dico_biagrams = {}
     for biagram in biagrams:
         if biagram not in dico_biagrams and (biagram[1], biagram[0]) not in dico_biagrams:
@@ -54,6 +54,18 @@ def get_weighted_biagram_appearance(biagrams, sent, weights_each_type):
             dico_biagrams[biagram] +=  weights_each_type[sent[biagram[0]][0]] + weights_each_type[sent[biagram[1]][0]]
         elif (biagram[1], biagram[0]) in dico_biagrams:
             dico_biagrams[(biagram[1], biagram[0])] += weights_each_type[sent[biagram[0]][0]] + weights_each_type[sent[biagram[1]][0]]
+    return dico_biagrams
+
+def get_weighted_biagram_appearance(biagrams, sent, weights_each_type):
+    dico_biagrams = {}
+    gram_attribute = list(weights_each_type.keys())
+    for biagram in biagrams:
+        dico_biagrams[biagram] = np.zeros(len(gram_attribute))
+        if biagram not in dico_biagrams and (biagram[1], biagram[0]) not in dico_biagrams:
+            idx_0 = gram_attribute.index(sent[biagram[0]][0])
+            idx_1 = gram_attribute.index(sent[biagram[1]][0])
+            dico_biagrams[biagram][idx_0] = 1
+            dico_biagrams[biagram][idx_1] = 1 
     return dico_biagrams
 
 def biagrams_to_nx_graph(list_of_words, dico_biagrams):

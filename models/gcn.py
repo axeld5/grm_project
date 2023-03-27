@@ -31,29 +31,3 @@ class GCN(torch.nn.Module):
         x = global_mean_pool(x, torch.zeros(x.size(0), dtype=torch.long).to(self.device))
         x = self.classifier(x)
         return x, F.log_softmax(x, dim=1)
-
-class EdgeGCN(torch.nn.Module):
-    def __init__(self, num_node_features, hidden_dim, num_classes, dropout=0.2):
-        super().__init__()
-        self.conv1 = GCNConv(num_node_features, hidden_dim)
-        self.conv2 = GCNConv(hidden_dim, hidden_dim)
-        self.conv3 = GCNConv(hidden_dim, hidden_dim)
-        self.classifier = torch.nn.Linear(hidden_dim, num_classes)
-        self.optimizer = torch.optim.Adam(self.parameters(), lr=0.0001, weight_decay=5e-4)
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.dropout = dropout
-
-    def forward(self, x, edge_index, edge_weight):
-
-        x = self.conv1(x, edge_index, edge_weight)
-        x = F.relu(x)
-        x = F.dropout(x, p=self.dropout, training=self.training)
-
-        h = self.conv2(x, edge_index, edge_weight)
-        x = F.relu(x+h)
-        x = F.dropout(x, p=self.dropout, training=self.training)
-
-        x = self.conv3(x, edge_index, edge_weight)
-        x = global_mean_pool(x, torch.zeros(x.size(0), dtype=torch.long).to(self.device))
-        x = self.classifier(x)
-        return x, F.log_softmax(x, dim=1)

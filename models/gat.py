@@ -46,9 +46,10 @@ class EdgeGAT(torch.nn.Module):
         self.out_head = 3
         self.dropout = dropout
         
-        self.conv1 = GATConv(num_node_features, self.hid, heads=self.first_heads, dropout=self.dropout)
-        self.conv2 = GATConv(self.hid*self.first_heads, self.hid, heads=self.first_heads, dropout=self.dropout)
-        self.conv3 = GATConv(self.hid*self.first_heads, self.hid, heads=self.out_head, concat=False, dropout=self.dropout)
+        self.edge_dim = 19
+        self.conv1 = GATConv(num_node_features, self.hid, heads=self.first_heads, dropout=self.dropout, edge_dim=self.edge_dim)
+        self.conv2 = GATConv(self.hid*self.first_heads, self.hid, heads=self.first_heads, dropout=self.dropout, edge_dim=self.edge_dim)
+        self.conv3 = GATConv(self.hid*self.first_heads, self.hid, heads=self.out_head, concat=False, dropout=self.dropout, edge_dim=self.edge_dim)
         self.classifier = torch.nn.Linear(self.hid, num_classes)
         self.optimizer = torch.optim.Adam(self.parameters(), lr=0.0001)
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
