@@ -7,12 +7,12 @@ from models.graphsage import GraphSAGE
 from train_test_text_models import train, test, edge_train, edge_test
 
 def evaluate_models(list_of_reviews, num_node_features, num_classes, device, epochs=10, 
-                    gcn_hidden_size=256, gat_hidden_size=128, gsage_hidden_size=300, num_loops=5):
+                    gcn_hidden_size=256, gat_hidden_size=128, gsage_hidden_size=300, num_loops=5, batch_size=1):
     perf_dict = {"model_name":[], "accuracy":[]}
     for _ in range(num_loops):
         train_data, test_data = train_test_split(list_of_reviews, test_size=0.1)
-        train_loader = DataLoader(train_data, batch_size=1, shuffle=True)
-        test_loader = DataLoader(test_data, batch_size=1, shuffle=False)        
+        train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+        test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)        
         final_gcn_accuracy, final_gat_accuracy, final_gsage_accuracy = evaluate_loop(train_loader, test_loader,
                                             num_node_features, num_classes, device, epochs, gcn_hidden_size, gat_hidden_size, gsage_hidden_size)
         perf_dict["model_name"].append("gcn")
@@ -24,17 +24,17 @@ def evaluate_models(list_of_reviews, num_node_features, num_classes, device, epo
     return perf_dict
 
 def evaluate_edge_model(list_of_reviews, num_node_features, num_classes, device, epochs=10, 
-                    gcn_hidden_size=256, gat_hidden_size=128, gsage_hidden_size=300, num_loops=5):
+                    gcn_hidden_size=256, gat_hidden_size=128, gsage_hidden_size=300, num_loops=5, batch_size=1):
     perf_dict = {"model_name":[], "accuracy":[]}
     for _ in range(num_loops):
         train_data, test_data = train_test_split(list_of_reviews, test_size=0.1)
-        train_loader = DataLoader(train_data, batch_size=1, shuffle=True)
-        test_loader = DataLoader(test_data, batch_size=1, shuffle=False)        
+        train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+        test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)        
         final_gat_accuracy, final_edge_gat_accuracy = evaluate_edge_loop(train_loader, test_loader,
                                             num_node_features, num_classes, device, epochs, gcn_hidden_size, gat_hidden_size, gsage_hidden_size)
         perf_dict["model_name"].append("gat")
         perf_dict["accuracy"].append(final_gat_accuracy)
-        perf_dict["model_name"].append("graphsage")
+        perf_dict["model_name"].append("edge_gat")
         perf_dict["accuracy"].append(final_edge_gat_accuracy)
     return perf_dict
 
@@ -69,7 +69,8 @@ def evaluate_loop(train_loader, test_loader, num_node_features, num_classes, dev
 
     return final_gcn_accuracy, final_gat_accuracy, final_gsage_accuracy
 
-def evaluate_edge_loop(train_loader, test_loader, num_node_features, num_classes, device, epochs=10, gcn_hidden_size=256, gat_hidden_size=128, gsage_hidden_size=300):
+def evaluate_edge_loop(train_loader, test_loader, num_node_features, num_classes, device, 
+                       epochs=10, gcn_hidden_size=256, gat_hidden_size=128, gsage_hidden_size=300):
 
     gat_model = GAT(num_node_features, gat_hidden_size, num_classes, dropout=0.2).to(device)
     for epoch in range(epochs):

@@ -22,7 +22,8 @@ class GraphSAGE(torch.nn.Module):
                                       
     self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-  def forward(self, x, edge_index):
+  def forward(self, data):
+    x, edge_index = data.x, data.edge_index
     ## layer 1 
     h = self.sage1(x, edge_index)
     h = torch.relu(h)
@@ -41,7 +42,7 @@ class GraphSAGE(torch.nn.Module):
 
     ## layer 4
     h = self.sage4(h, edge_index)
-    h = global_mean_pool(h, torch.zeros(h.size(0), dtype=torch.long).to(self.device))
+    h = global_mean_pool(h, data.batch)
 
     ## classification layer 
     h = self.classifier(h)
