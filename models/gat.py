@@ -46,7 +46,7 @@ class EdgeGAT(torch.nn.Module):
         self.out_head = 3
         self.dropout = dropout
         
-        self.edge_dim = 19
+        self.edge_dim = 38
         self.conv1 = GATConv(num_node_features, self.hid, heads=self.first_heads, dropout=self.dropout, edge_dim=self.edge_dim)
         self.conv2 = GATConv(self.hid*self.first_heads, self.hid, heads=self.first_heads, dropout=self.dropout, edge_dim=self.edge_dim)
         self.conv3 = GATConv(self.hid*self.first_heads, self.hid, heads=self.out_head, concat=False, dropout=self.dropout, edge_dim=self.edge_dim)

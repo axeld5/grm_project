@@ -5,8 +5,8 @@ import torch
 from torch_geometric.data import Data
 
 #nlp is a spacy model
-def biagram_preprocessing(review, label, nlp):
-
+def biagram_preprocessing(review, label, nlp, method="directed_bi"):
+    #methods : directed_bi, undirected_bi, weighted_bi
     weights_each_type = {'ADJ': 3, 'ADV': 2, 'NOUN': 1, 'VERB': 4, 'ADP': 1, 'DET': 1, 'NUM': 1, 'PUNCT': 1, 'PRON': 1, 'PROPN': 1, 'SCONJ': 1, 'SYM': 1, 'X': 1, 'PART': 1, 'CCONJ': 1, 'INTJ': 1, 'AUX': 1, 'SPACE': 1, '': 1}
 
     ## sentences preprocessing
@@ -19,7 +19,7 @@ def biagram_preprocessing(review, label, nlp):
     for sentence in sentences:
         sent.update(sentence)
     ### dico of how many times a biagram appears in the review
-    dico_biagrams = get_weighted_biagram_appearance(biagrams, sent, weights_each_type)
+    dico_biagrams = get_weighted_biagram_appearance(biagrams, sent, weights_each_type, method)
     list_of_words = [word for sent in sentences for word in sent]
     list_of_words = list(set(list_of_words))
     ## create graph 
@@ -45,27 +45,33 @@ def get_biagrams(sentences):
             biagrams.append((list(sent.keys())[i], list(sent.keys())[i+1]))
     return biagrams
 
-def old_get_weighted_biagram_appearance(biagrams, sent, weights_each_type):
-    dico_biagrams = {}
-    for biagram in biagrams:
-        if biagram not in dico_biagrams and (biagram[1], biagram[0]) not in dico_biagrams:
-            dico_biagrams[biagram] = weights_each_type[sent[biagram[0]][0]] + weights_each_type[sent[biagram[1]][0]]
-        elif biagram in dico_biagrams:
-            dico_biagrams[biagram] +=  weights_each_type[sent[biagram[0]][0]] + weights_each_type[sent[biagram[1]][0]]
-        elif (biagram[1], biagram[0]) in dico_biagrams:
-            dico_biagrams[(biagram[1], biagram[0])] += weights_each_type[sent[biagram[0]][0]] + weights_each_type[sent[biagram[1]][0]]
-    return dico_biagrams
-
-def get_weighted_biagram_appearance(biagrams, sent, weights_each_type):
+def get_weighted_biagram_appearance(biagrams, sent, weights_each_type, method="directed_bi"):
+    #methods : directed_bi, undirected_bi, weighted_bi
     dico_biagrams = {}
     gram_attribute = list(weights_each_type.keys())
     for biagram in biagrams:
-        dico_biagrams[biagram] = np.zeros(len(gram_attribute))
-        if biagram not in dico_biagrams and (biagram[1], biagram[0]) not in dico_biagrams:
-            idx_0 = gram_attribute.index(sent[biagram[0]][0])
-            idx_1 = gram_attribute.index(sent[biagram[1]][0])
-            dico_biagrams[biagram][idx_0] = 1
-            dico_biagrams[biagram][idx_1] = 1 
+        if method == "directed_bi":
+            if biagram not in dico_biagrams:
+                dico_biagrams[biagram] = np.zeros((len(gram_attribute), 2))
+                idx_0 = gram_attribute.index(sent[biagram[0]][0])
+                idx_1 = gram_attribute.index(sent[biagram[1]][0])
+                dico_biagrams[biagram][idx_0][0] = 1
+                dico_biagrams[biagram][idx_1][1] = 1 
+                dico_biagrams[biagram] = dico_biagrams[biagram].flatten()
+        elif method == "undirected_bi":
+            if biagram not in dico_biagrams and (biagram[1], biagram[0]) not in dico_biagrams:
+                dico_biagrams[biagram] = np.zeros(len(gram_attribute))
+                idx_0 = gram_attribute.index(sent[biagram[0]][0])
+                idx_1 = gram_attribute.index(sent[biagram[1]][0])
+                dico_biagrams[biagram][idx_0] = 1
+                dico_biagrams[biagram][idx_1] = 1 
+        elif method == "weighted_bi":
+            if biagram not in dico_biagrams and (biagram[1], biagram[0]) not in dico_biagrams:
+                dico_biagrams[biagram] = weights_each_type[sent[biagram[0]][0]] + weights_each_type[sent[biagram[1]][0]]
+            elif biagram in dico_biagrams:
+                dico_biagrams[biagram] +=  weights_each_type[sent[biagram[0]][0]] + weights_each_type[sent[biagram[1]][0]]
+            elif (biagram[1], biagram[0]) in dico_biagrams:
+                dico_biagrams[(biagram[1], biagram[0])] += weights_each_type[sent[biagram[0]][0]] + weights_each_type[sent[biagram[1]][0]]
     return dico_biagrams
 
 def biagrams_to_nx_graph(list_of_words, dico_biagrams):

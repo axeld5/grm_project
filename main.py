@@ -20,5 +20,5 @@ if __name__ == "__main__":
     num_classes = get_num_classes(dataset_name)
     num_node_features = 300 
     epochs = 20
-    perf_dict = evaluate_models(list_of_reviews, num_node_features, num_classes, device, epochs=epochs, batch_size=batch_size)
+    perf_dict = evaluate_edge_model(list_of_reviews, num_node_features, num_classes, device, epochs=epochs, batch_size=batch_size)
     show_boxplot(perf_dict, x="model_name", y="accuracy")

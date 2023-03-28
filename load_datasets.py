@@ -19,13 +19,14 @@ def load_dataset(dataset_name:str) -> pd.DataFrame:
         df = df.sample(frac=1).reset_index(drop=True)
     return df 
 
-def preprocess_dataset(dataset_name:str, df:pd.DataFrame, amount_taken:int) -> list:
+def preprocess_dataset(dataset_name:str, df:pd.DataFrame, amount_taken:int, method:str="directed_bi") -> list:
+    #methods : directed_bi, undirected_bi, weighted_bi
     nlp = spacy.load('en_core_web_md')
     texts, labels = get_texts_and_labels(dataset_name, df)
     list_of_reviews = [] 
     frac_taken = amount_taken//10
     for i in range(amount_taken):
-        data = biagram_preprocessing(texts[i], labels[i], nlp)
+        data = biagram_preprocessing(texts[i], labels[i], nlp, method)
         list_of_reviews.append(data)
         if i%frac_taken == 0:
             print(i)
