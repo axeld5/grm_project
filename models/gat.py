@@ -39,14 +39,13 @@ class GAT(torch.nn.Module):
         return x,F.log_softmax(x, dim=1)
 
 class EdgeGAT(torch.nn.Module):
-    def __init__(self, num_node_features, hidden_classes, num_classes, dropout=0.3):
+    def __init__(self, num_node_features, hidden_classes, num_classes, edge_dim, dropout=0.3):
         super(EdgeGAT, self).__init__()
         self.hid = hidden_classes
         self.first_heads = 5
         self.out_head = 3
         self.dropout = dropout
-        
-        self.edge_dim = 38
+        self.edge_dim = edge_dim
         self.conv1 = GATConv(num_node_features, self.hid, heads=self.first_heads, dropout=self.dropout, edge_dim=self.edge_dim)
         self.conv2 = GATConv(self.hid*self.first_heads, self.hid, heads=self.first_heads, dropout=self.dropout, edge_dim=self.edge_dim)
         self.conv3 = GATConv(self.hid*self.first_heads, self.hid, heads=self.out_head, concat=False, dropout=self.dropout, edge_dim=self.edge_dim)
