@@ -1,6 +1,5 @@
 import torch
 import numpy as np 
-import pandas as pd 
 import os 
 os.environ["WANDB_DISABLED"] = "true"
 
@@ -14,7 +13,7 @@ def preprocess_function(examples):
 
 if __name__ == "__main__":    
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    dataset_name = "amazon"    
+    dataset_name = "newsgroup"    
     num_labels = get_num_classes(dataset_name)
     df = load_dataset(dataset_name)
     data = from_df_to_dataset(dataset_name, df)
@@ -39,7 +38,7 @@ if __name__ == "__main__":
         training_args = TrainingArguments(
             output_dir=".",
             learning_rate=2e-5,
-            per_device_train_batch_size=16,
+            per_device_train_batch_size=32,
             per_device_eval_batch_size=16,
             num_train_epochs=1,
             weight_decay=0.01,

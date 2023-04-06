@@ -1,5 +1,4 @@
 import torch.nn.functional as F 
-import torch 
 
 def train(model, loader, device):
     model.train()
@@ -8,7 +7,6 @@ def train(model, loader, device):
     for data in loader:
         data = data.to(device)
         optimizer.zero_grad()
-        #_, out = model(data.x.float(), data.edge_index)
         _, out = model(data)
         loss = F.nll_loss(out, data.y.long())
         loss.backward()

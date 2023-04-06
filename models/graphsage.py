@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from torch_geometric.nn import SAGEConv, global_add_pool, global_mean_pool  
+from torch_geometric.nn import SAGEConv, global_mean_pool  
 
 '''
 Graph SAGE: SAmpling and aggreGatE, 

@@ -1,9 +1,8 @@
 import evaluate
 import numpy as np
 import pandas as pd 
-import torch 
 
-from datasets import Dataset, load_dataset
+from datasets import Dataset
 
 def compute_metrics(eval_pred):
     accuracy = evaluate.load("accuracy")
@@ -17,5 +16,9 @@ def from_df_to_dataset(dataset_name:str, df:pd.DataFrame) -> Dataset:
         df.rename(columns={"review":"text"}, inplace=True)
     elif dataset_name == "amazon":
         df.rename(columns={"reviewText":"text"}, inplace=True)
+    elif dataset_name == "newsgroup":
+        df.rename(columns={"text_cleaned":"text"}, inplace=True)
+        df.drop(["target"], axis=1, inplace=True)
+        df["text"] = df["text"].astype('U')
     data = Dataset.from_pandas(df).train_test_split(test_size=0.1)
     return data 

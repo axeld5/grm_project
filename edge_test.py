@@ -1,9 +1,7 @@
 import torch
-import pandas as pd 
-import spacy
 
 from load_datasets import load_dataset, preprocess_dataset, remove_too_small, get_num_classes
-from evaluate_models import evaluate_models, evaluate_all_edge_models
+from evaluate_models import evaluate_all_edge_models
 from visualise import show_boxplot, get_avg_std, compare_models
 
 if __name__ == "__main__":    
