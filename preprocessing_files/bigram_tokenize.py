@@ -24,6 +24,7 @@ def biagram_preprocessing(review, label, nlp, method="directed_bi"):
     list_of_words = list(set(list_of_words))
     ## create graph 
     G = biagrams_to_nx_graph(list_of_words, dico_biagrams)
+    G = clean_isolated_nodes(G)
     node_features, edges, edges_attr = get_graph_features(G, nlp)  
     # Get the label
     label_value = int(label)
@@ -81,6 +82,10 @@ def biagrams_to_nx_graph(list_of_words, dico_biagrams):
     ## add edges
     for biagram in dico_biagrams.keys():
         G.add_edge(biagram[0], biagram[1], weight = dico_biagrams[biagram])
+    return G
+
+def clean_isolated_nodes(G):
+    G.remove_nodes_from(list(nx.isolates(G)))
     return G
 
 def get_graph_features(G, nlp):    
